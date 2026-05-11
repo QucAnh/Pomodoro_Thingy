@@ -1,0 +1,59 @@
+name: Build Pomodoro_thingy
+
+on:
+  push:
+    branches: [main]      # runs every time you push to main
+  workflow_dispatch:       # also lets you trigger it manually
+
+jobs:
+  # ── Windows ──────────────────────────────────
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.14.4'
+
+      - name: Install dependencies
+        run: pip install pyinstaller customtkinter pillow
+
+      - name: Build exe
+        run: pyinstaller --onefile --windowed --name "Pomodoro" pomodoro.py
+
+      - name: Upload exe
+        uses: actions/upload-artifact@v3
+        with:
+          name: Pomodoro-Windows
+          path: dist/Pomodoro.exe
+
+  # ── Linux ─────────────────────────────────────
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y python3-tk
+          pip install pyinstaller customtkinter pillow
+
+      - name: Build binary
+        run: pyinstaller --onefile --name "Pomodoro" pomodoro.py
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: Pomodoro-Linux
+          path: dist/Pomodoro
